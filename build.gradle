@@ -1,0 +1,149 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'checkstyle'
+    id 'jacoco'
+    id 'eclipse'
+    id 'idea'
+    id 'com.github.spotbugs' version '5.0.14'
+}
+
+group 'com.modista'
+version '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    withSourcesJar()
+    withJavadocJar()
+}
+
+repositories {
+    mavenCentral()
+    
+    // Para plugins adicionales si se necesitan
+    gradlePluginPortal()
+}
+
+configurations {
+    // Configuración para excluir archivos duplicados
+    implementation.exclude group: 'org.slf4j', module: 'slf4j-simple'
+}
+
+ext {
+    // Versiones de dependencias
+    sqliteVersion = '3.43.0.0'
+    slf4jVersion = '2.0.9'
+    logbackVersion = '1.4.11'
+    junitVersion = '5.10.0'
+    mockitoVersion = '5.5.0'
+    swingxVersion = '1.6.5-1'
+}
+
+dependencies {
+    // Base de datos
+    implementation "org.xerial:sqlite-jdbc:${sqliteVersion}"
+    
+    // Logging
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation "ch.qos.logback:logback-classic:${logbackVersion}"
+    
+    // GUI mejorada
+    implementation "org.swinglabs:swingx:${swingxVersion}"
+    
+    // Testing
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+    
+    // Testing adicional
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+    
+    // Análisis estático de código
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.12.0'
+}
+
+application {
+    mainClass = 'com.modista.Main'
+    applicationDefaultJvmArgs = [
+        '-Xms256m', '-Xmx512m',
+        '-Dfile.encoding=UTF-8',
+        '-Duser.language=es',
+        '-Duser.country=MX'
+    ]
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+        showStandardStreams = true
+    }
+    
+    reports {
+        html.required = true
+    }
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+checkstyle {
+    toolVersion = '10.12.3'
+    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+    showViolations = true
+    ignoreFailures = false
+}
+
+spotbugs {
+    effort = "max"
+    reportLevel = "high"
+    excludeFilter = file("${rootDir}/config/spotbugs/exclude.xml")
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += [
+        '-Xlint:unchecked',
+        '-Xlint:deprecation',
+        '-parameters'
+    ]
+}
+
+// Tarea para verificar el entorno de desarrollo
+task checkEnvironment {
+    doLast {
+        println "Java Version: ${System.getProperty('java.version')}"
+        println "Java Home: ${System.getProperty('java.home')}"
+        println "OS: ${System.getProperty('os.name')} ${System.getProperty('os.version')}"
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'com.modista.Main',
+            'Implementation-Title': 'Sistema de Cálculo de Tallas',
+            'Implementation-Version': version,
+            'Built-By': System.getProperty('user.name'),
+            'Built-Date': new Date().format("yyyy-MM-dd HH:mm:ss")
+        )
+    }
+    
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Excluir errores conocidos y falsos positivos -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Class name="com.modista.model.Cliente"/>
+    </Match>
+
+    <!-- Excluir warnings de serialización en la GUI -->
+    <Match>
+        <Bug pattern="SE_BAD_FIELD"/>
+        <Class name="com.modista.gui.VentanaPrincipal"/>
+    </Match>
+
+    <!-- Excluir warnings de recursos no cerrados en el DatabaseManager -->
+    <Match>
+        <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
+        <Class name="com.modista.db.DatabaseManager"/>
+    </Match>
+</FindBugsFilter>
