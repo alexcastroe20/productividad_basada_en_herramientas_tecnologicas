@@ -70,8 +70,8 @@ dependencies {
 
 1. Clonar el repositorio:
 ```bash
-git clone https://github.com/tu-usuario/modista-app.git
-cd modista-app
+git clone https://github.com/alexcastroe20/productividad_basada_en_herramientas_tecnologicas.git
+cd productividad_basada_en_herramientas_tecnologicas
 ```
 
 2. Compilar el proyecto:
@@ -201,4 +201,4 @@ Noé Alejandro Castro Encinia
 AL02964080
 Universidad TecMilenio
 
-Link del Proyecto: [https://github.com/tu-usuario/modista-app](https://github.com/tu-usuario/modista-app)
+Link del Proyecto: https://github.com/alexcastroe20/productividad_basada_en_herramientas_tecnologicas.git
