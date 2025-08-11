@@ -1,0 +1,39 @@
+language: java
+jdk:
+  - openjdk11
+
+# Cache Gradle dependencies
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+# Instalar dependencias antes de la compilación
+before_install:
+  - chmod +x gradlew
+
+# Script de construcción
+script:
+  - ./gradlew build
+  - ./gradlew test
+  - ./gradlew jacocoTestReport
+  - ./gradlew checkstyleMain
+  - ./gradlew spotbugsMain
+
+# Notificar resultados
+notifications:
+  email:
+    recipients:
+      - tu.email@example.com
+    on_success: change
+    on_failure: always
+
+# Reportar cobertura de código
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
+# Solo construir estas ramas
+branches:
+  only:
+    - main
+    - develop
